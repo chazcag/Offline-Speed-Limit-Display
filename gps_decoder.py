@@ -3,6 +3,7 @@
 import serial
 import time
 import math
+from config import SERIAL_PORT, BAUD_RATE
 
 class NazaDecoder:
     def __init__(self):
@@ -57,26 +58,29 @@ class NazaDecoder:
         if self.message_id != 0x10 or self.payload_length != 0x3A:
             return None
 
-        # Your original reliable XOR mask (keeps sats, fix=3, seq stable)
+        # Reliable XOR mask (keeps sats, fix=3, seq stable)
         xor_mask = self.payload[24]
 
-        # Your original unmasked indices
+        # Unmasked indices
         unmasked_indices = [48, 49, 56, 57]
 
         # Apply XOR only to masked bytes
         unxor_payload = [b ^ xor_mask if i not in unmasked_indices else b for i, b in enumerate(self.payload)]
 
-        # Stable field extraction (matching your original working decoder)
+        # Stable field extraction
         lon = int.from_bytes(unxor_payload[4:8], 'little', signed=True) / 1e7
         lat = int.from_bytes(unxor_payload[8:12], 'little', signed=True) / 1e7
         num_sats = self.payload[48]
         fix_type = unxor_payload[50]
         seq_num = self.payload[56] + (self.payload[57] << 8)
 
-        # Date/time from indices 0:4 after unxor (as in the earlier working version)
+        # Unfortunately due to the hour being reported as 0-15, hour & day are not usable
+        # There is no reliable way to distinguish between hours 00-07 and 16-23 making this section somewhat useless
+
+        # Date/time from indices 0:4 after unxor
         dt_raw = int.from_bytes(unxor_payload[0:4], 'little')
 
-        # Bit unpacking matching the earlier code that gave 2035-12-23
+        # Bit unpacking
         second = (dt_raw >> 0) & 0x3F   # bits 0-5
         minute = (dt_raw >> 6) & 0x3F   # bits 6-11
         hour   = (dt_raw >> 12) & 0x0F  # bits 12-15 (reported 0-15)
@@ -84,10 +88,10 @@ class NazaDecoder:
         month  = (dt_raw >> 21) & 0x0F  # bits 21-24
         year   = (dt_raw >> 25) & 0x7F  # bits 25-31 (7-bit offset)
 
-        # Change base to 2000 instead of 2010 (as you requested)
+        # Change base to 2000
         full_year = 2000 + year
-
-        # Quirk correction from the earlier code (add 1 day if reported hour >7)
+        """
+        # Quirk correction? (add 1 day if reported hour >7)
         if hour > 7:
             day += 1
             if day > 31:  # Rough carry-over
@@ -96,13 +100,7 @@ class NazaDecoder:
                 if month > 12:
                     month = 1
                     full_year += 1
-
-        # Use reported hour (as in earlier code; keeps 07:xx in PM)
-        displayed_hour = hour
-
-        # Optional: restore true UTC hour (uncomment to show ~23:xx in PM, date remains 2025-12-23)
-        if hour <= 7:
-            displayed_hour += 16
+        """
 
         return {
             'lat': lat,
@@ -111,10 +109,10 @@ class NazaDecoder:
             'fix_type': fix_type,
             'seq_num': seq_num,
             'date': f"{full_year}-{month:02d}-{day:02d}",
-            'time': f"{displayed_hour:02d}:{minute:02d}:{second:02d}"
+            'time': f"{hour:02d}:{minute:02d}:{second:02d}"
         }
 
-# Function to get a decoded message from serial
+# Get a decoded message from serial
 def get_decoded_message(ser, decoder):
     while True:
         data = ser.read(ser.in_waiting or 1)  # Read available bytes or at least 1
@@ -124,14 +122,14 @@ def get_decoded_message(ser, decoder):
                 return result
         time.sleep(0.1)
 
+
 if __name__ == "__main__":
     # Test the decoder standalone
-    from config import SERIAL_PORT, BAUD_RATE
     ser = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=0.1)
     decoder = NazaDecoder()
     result = get_decoded_message(ser, decoder)
 #    print(f"Decoded GPS: Lat: {result['lat']:.7f}, Lon: {result['lon']:.7f}, Sats: {result['sats']}, Fix: {result['fix_type']}, Seq: {result['seq_num']}")
     print(f"Decoded GPS: Lat: {result['lat']:.7f}, Lon: {result['lon']:.7f}, "
-        f"Sats: {result['sats']}, Fix: {result['fix_type']}, Seq: {result['seq_num']}, "
-        f"Date: {result['date']} Time: {result['time']}")
+          f"Sats: {result['sats']}, Fix: {result['fix_type']}, Seq: {result['seq_num']}, "
+          f"Date: {result['date']} Time: {result['time']}")
     ser.close()

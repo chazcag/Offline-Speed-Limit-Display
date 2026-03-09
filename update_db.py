@@ -1,15 +1,14 @@
-# update_db.py - Update the OSM database with fresh data
+# update_db.py - Update the local OSM database with fresh data
 
 import os
 import subprocess
 import requests
 from datetime import datetime, timedelta
 import psycopg2
-from config import DB_NAME, DB_USER, DB_PASSWORD
+from config import DB_NAME, DB_USER, DB_PASSWORD, DB_PORT, pbf_url, pbf_file, filtered_pbf
 
-# Download and filter (same as tiling script)
-pbf_url = 'https://download.geofabrik.de/north-america/us/texas-latest.osm.pbf'
-pbf_file = '/home/sys-car/gps_project/data/texas-latest.osm.pbf'
+# Download and filter
+
 two_weeks_ago = datetime.now() - timedelta(weeks=2)
 should_download = False
 
@@ -39,10 +38,7 @@ else:
     print("Using existing PBF file.")
 
 
-filtered_pbf = '/home/sys-car/gps_project/data/texas-roads.osm.pbf'
-
-# Always remove the old filtered file if we're downloading a new source
-# or if the filtered file doesn't exist
+# Always remove the old filtered file if downloading a new source or if the filtered file doesn't exist
 should_filter = should_download or not os.path.exists(filtered_pbf)
 
 if should_filter:
@@ -62,7 +58,7 @@ conn = psycopg2.connect(
     user=DB_USER,
     password=DB_PASSWORD,
     host='localhost',      # forces TCP connection on 127.0.0.1
-    port=5432
+    port=DB_PORT
 )
 cursor = conn.cursor()
 cursor.execute("DROP TABLE IF EXISTS planet_osm_line, planet_osm_point, planet_osm_polygon, planet_osm_ways, planet_osm_nodes, planet_osm_rels, planet_osm_roads CASCADE;")

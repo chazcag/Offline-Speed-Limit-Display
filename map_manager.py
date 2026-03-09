@@ -3,7 +3,7 @@
 import psycopg2
 from pyproj import Transformer
 
-from config import DB_HOST, DB_NAME, DB_USER, DB_PASSWORD
+from config import DB_HOST, DB_NAME, DB_USER, DB_PASSWORD, speed_fallback
 
 class MapManager:
     def __init__(self):
@@ -28,7 +28,7 @@ class MapManager:
                 speed_limit = int(''.join(filter(str.isdigit, maxspeed_str))) if maxspeed_str else 0
                 is_fallback = False
                 if speed_limit == 0 and highway_type in ['service', 'residential']:
-                    speed_limit = 30  # Fallback for service or residential roads
+                    speed_limit = speed_fallback  # Fallback for service or residential roads
                     is_fallback = True
                 return {'speed_limit': speed_limit, 'dist': dist, 'is_fallback': is_fallback, 'highway_type': highway_type}
             else:
@@ -40,8 +40,9 @@ class MapManager:
     def __del__(self):
         self.cursor.close()
         self.conn.close()
+
+ # Test the map manager standalone
 if __name__ == "__main__":
-    # Test the map manager standalone
     manager = MapManager()
     result = manager.get_speed_limit(00.0000000, -00.0000000)  # Example lat/lon"
     print(f"Speed limit: {result['speed_limit']} mph, Distance: {result['dist']} m, Fallback: {result['is_fallback']}, Highway type: {result['highway_type']}")

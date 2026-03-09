@@ -1,8 +1,9 @@
-# display.py - Final stable version with flicker-free multiplexing and smooth spinner
+# display.py - Stable version with flicker-free multiplexing and miltiple animations
 
 from animations import ANIMATIONS, DEFAULT_ANIMATION
 from gpiozero import LED
 from time import sleep
+from config import SGMT_GPIO, COMMON_D1_PIN, COMMON_D2_PIN
 import threading
 import time
 
@@ -20,10 +21,10 @@ DIGITS = [
     [1,1,1,1,0,1,1]   # 9
 ]
 
-# Pin mappings (common anode LTD-482EC)
-SEGMENT_PINS = [LED(16), LED(21), LED(8), LED(1), LED(7), LED(20), LED(12)]  # a b c d e f g
-COMMON_DIGIT1 = LED(24)  # Left digit (tens)
-COMMON_DIGIT2 = LED(23)  # Right digit (units)
+# Pin mappings
+SEGMENT_PINS = [LED(SGMT_GPIO[0]), LED(SGMT_GPIO[1]), LED(SGMT_GPIO[2]), LED(SGMT_GPIO[3]), LED(SGMT_GPIO[4]), LED(SGMT_GPIO[5]), LED(SGMT_GPIO[6])]  # a b c d e f g
+COMMON_DIGIT1 = LED(COMMON_D1_PIN)  # Left digit (tens)
+COMMON_DIGIT2 = LED(COMMON_D2_PIN)  # Right digit (units)
 
 # Global state
 current_speed = 0
@@ -33,7 +34,7 @@ frame_counter = 0   # For slowing down animation without hurting refresh rate
 lock = threading.Lock()
 display_thread = None
 current_animation_name = DEFAULT_ANIMATION
-digit_delay_number     = 0.015
+digit_delay_number = 0.01
 
 
 def start_display():
@@ -129,7 +130,7 @@ def _display_loop():
             anim = ANIMATIONS[current_animation_name]
             delay = anim["delay"]
             frames = anim["frames"]
-            step = anim["step"]   # ← this is now dynamic per animation
+            step = anim["step"]
 
             _set_segments(frames[frame], delay=delay)
 
@@ -138,10 +139,10 @@ def _display_loop():
                 current_frame = (current_frame + 1) % len(frames)
                 frame_counter = 0
 
-                # Optional: one-shot handling
+                # one-shot handling
                 if anim.get("one_shot", False) and current_frame == 0:
                     # animation finished → switch to default (e.g. spinner or blank)
-                    set_animation("spinner")  # or whatever default you want
+                    set_animation("spinner")
         else: 
             continue
 
