@@ -2,9 +2,9 @@
 
 A privacy focused speed limit display for your old car. 
 
-Utilizing a GPS module, a Raspberry Pi, and a 7-segment display, this project displays the speed limit of whatever road you are currently on, in real-time without an active internet connection. No telemetry, no subscriptions, no BS, you are in control!
+Utilizing a GPS module, a Raspberry Pi, and a 7-segment display, this project shows the speed limit of whatever road you're currently on, in real-time without an active internet connection. No telemetry, no subscriptions, no BS, you are in control!
 
-This project woudn't be possible without [OpenStreetMap region downloads](https://download.geofabrik.de/), [osm2pgsql](https://github.com/osm2pgsql-dev/osm2pgsql) for converting to a PostgreSQL/postGIS database, and the 31 GPS sats flying over our heads. 
+This is made possible by [OpenStreetMap (and their region downloads)](https://download.geofabrik.de/), [osm2pgsql](https://github.com/osm2pgsql-dev/osm2pgsql) for converting to a PostgreSQL/postGIS database, and the 31 GPS sats flying over our heads. 
 
 ### Hardware Used
   - Phantom 2 GPS module (DJI 11-22 V2)
