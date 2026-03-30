@@ -1,11 +1,12 @@
-# display.py - Stable version with flicker-free multiplexing and miltiple animations
+# display.py - Stable version with flicker-free multiplexing and multiple animations
 
+import threading
+import time
 from animations import ANIMATIONS, DEFAULT_ANIMATION
 from gpiozero import LED
 from time import sleep
 from config import SGMT_GPIO, COMMON_D1_PIN, COMMON_D2_PIN
-import threading
-import time
+
 
 # Segment patterns for 0-9 (1 = on, meaning segment should be lit)
 DIGITS = [
@@ -148,7 +149,7 @@ def _display_loop():
 
 
 
-
+# Test the display standalone
 if __name__ == "__main__":
     start_display()
 

@@ -1,0 +1,16 @@
+[Unit]
+Description=Offline Speed Limit Display main program
+After=network.target
+
+[Service]
+Type=simple
+User=sys-car
+WorkingDirectory=/home/sys-car/gps_project
+ExecStart=/home/sys-car/miniforge3/envs/gps_env/bin/python /home/sys-car/gps_project/main.py
+StandardOutput=append:/home/sys-car/gps_project/log/speed-limit_core.log
+StandardError=append:/home/sys-car/gps_project/log/speed-limit_core.log
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,18 @@
+[Unit]
+Description=Offline Speed Limit Display - Power Manager (ACC + MOSFET hold)
+After=multi-user.target
+Before=speed-limit_core.service 
+
+[Service]
+Type=simple
+User=sys-car
+WorkingDirectory=/home/sys-car/gps_project
+ExecStart=/home/sys-car/miniforge3/envs/gps_env/bin/python /home/sys-car/gps_project/power_manager.py
+StandardOutput=append:/home/sys-car/gps_project/log/power_manager.log
+StandardError=append:/home/sys-car/gps_project/log/power_manager.log
+Restart=always
+RestartSec=2
+
+
+[Install]
+WantedBy=multi-user.target

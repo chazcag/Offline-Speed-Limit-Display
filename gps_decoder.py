@@ -74,8 +74,8 @@ class NazaDecoder:
         fix_type = unxor_payload[50]
         seq_num = self.payload[56] + (self.payload[57] << 8)
 
-        # Unfortunately due to the hour being reported as 0-15, hour & day are not usable
-        # There is no reliable way to distinguish between hours 00-07 and 16-23 making this section somewhat useless
+        # Unfortunately due to the hour being reported as 0-15, hour & day are not accurate
+        # There is no reliable way to distinguish between hours 00-07 and 16-23
 
         # Date/time from indices 0:4 after unxor
         dt_raw = int.from_bytes(unxor_payload[0:4], 'little')
@@ -90,17 +90,6 @@ class NazaDecoder:
 
         # Change base to 2000
         full_year = 2000 + year
-        """
-        # Quirk correction? (add 1 day if reported hour >7)
-        if hour > 7:
-            day += 1
-            if day > 31:  # Rough carry-over
-                day = 1
-                month += 1
-                if month > 12:
-                    month = 1
-                    full_year += 1
-        """
 
         return {
             'lat': lat,
@@ -123,8 +112,8 @@ def get_decoded_message(ser, decoder):
         time.sleep(0.1)
 
 
+# Test the decoder standalone
 if __name__ == "__main__":
-    # Test the decoder standalone
     ser = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=0.1)
     decoder = NazaDecoder()
     result = get_decoded_message(ser, decoder)
