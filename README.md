@@ -31,7 +31,5 @@ This is made possible by [OpenStreetMap (and their region downloads)](https://do
   - threading
   - time
 
-### Where it's at?
-I got two turntables and a microphone....
-
+### Status
 Still in progress. Home stretch, only a few features left to add, however the current code works well as is. 
