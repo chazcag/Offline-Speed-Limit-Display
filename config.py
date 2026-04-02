@@ -53,18 +53,18 @@ LOG_BACKUP_COUNT = 5
 
 # NETWORK / WIFI (for auto map updates)
 # ==========================
-HOME_WIFI_SSID = "YOUR_HOME_SSID"     # ← change to your home network name
-HOME_WIFI_PASSWORD = "YOUR_PASSWORD"  # ← change (or use nmcli keyfile if preferred)
+HOME_WIFI_SSID = "WouldYouLikeFriesWithThat_5G"     # ← change to your home network name
 
 # HOME GEOFENCE (optional — for smarter WiFi updates)
 # ==========================
-HOME_LAT = 00.0000000                 # ← your approximate home latitude
-HOME_LON = -00.0000000                # ← your approximate home longitude
+HOME_LAT = REMOVED                 # ← your approximate home latitude
+HOME_LON = REMOVED                # ← your approximate home longitude
 HOME_RADIUS_METERS = 55               # trigger WiFi/update only inside this circle
  
 # UPDATE SCHEDULER
 # ==========================
 UPDATE_INTERVAL_DAYS = 14
+LAST_UPDATE_FILE = os.path.join(DATA_DIR, "last_map_update.timestamp")
 
 # ANIMATIONS
 # ==========================

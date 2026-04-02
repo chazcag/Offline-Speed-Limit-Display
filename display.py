@@ -5,8 +5,10 @@ import time
 from animations import ANIMATIONS, DEFAULT_ANIMATION
 from gpiozero import LED
 from time import sleep
+from logger import get_logger
 from config import SGMT_GPIO, COMMON_D1_PIN, COMMON_D2_PIN
 
+logger = get_logger(__name__)
 
 # Segment patterns for 0-9 (1 = on, meaning segment should be lit)
 DIGITS = [
@@ -45,17 +47,19 @@ def start_display():
         if display_thread is None:
             display_thread = threading.Thread(target=_display_loop, daemon=True)
             display_thread.start()
+            logger.info("Display thread started")
 
 def stop_display():
     """Stop the display and clean up GPIO pins."""
     global display_thread
     with lock:
         if display_thread:
-            display_thread = None  # Daemon will exit with program
+            display_thread = None
     blank = [0] * 14
     _set_segments(blank, delay=digit_delay_number)
     for pin in SEGMENT_PINS + [COMMON_DIGIT1, COMMON_DIGIT2]:
-        pin.close()  # gpiozero cleanup
+        pin.close()
+    logger.info("Display stopped and GPIO cleaned")
 
 def set_speed(speed):
     """Set the speed to display (0-99), switching to number mode. Falls back to loading on invalid input."""
