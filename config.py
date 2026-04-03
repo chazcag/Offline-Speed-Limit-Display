@@ -53,7 +53,7 @@ LOG_BACKUP_COUNT = 5
 
 # NETWORK / WIFI (for auto map updates)
 # ==========================
-HOME_WIFI_SSID = "WouldYouLikeFriesWithThat_5G"     # ← change to your home network name
+HOME_WIFI_SSID = "WIFI_SSID"     # ← change to your home network name
 
 # HOME GEOFENCE (optional — for smarter WiFi updates)
 # ==========================
